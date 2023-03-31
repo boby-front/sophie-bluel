@@ -155,9 +155,16 @@ li:hover {
 	cursor: pointer;
 }
 
-.fontButtonSelected{
+.fontButton2{
+	font-family: 'Syne';
+	font-size: 16px;
+	font-weight: 700;
 	background-color: #1D6154;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
 	color: white;
+	padding: 8px 15px;
+	cursor: pointer;
 }
 
 .gallery {
