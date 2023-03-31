@@ -1,55 +1,73 @@
+// Sélectionne l'élément HTML avec la classe "imagesGroup"
+const imagesGroup = document.querySelector(".imagesGroup");
+
+// Crée un nouvel élément <div> et lui attribue la classe "gallery"
+const divGallery = document.createElement("div");
+divGallery.className = "gallery";
+
+// Ajoute l'élément <div> nouvellement créé à l'élément "imagesGroup"
+imagesGroup.appendChild(divGallery);
+
+// Envoie une requête à l'API "http://localhost:5678/api/works"
+// et traite la réponse sous forme de données JSON
 fetch('http://localhost:5678/api/works')
   .then(response => response.json())
-  .then(data => console.log(data))
+  .then(data => {
+    // Parcours les données reçues de l'API
+    data.forEach(item => {
+      // Crée un nouvel élément <figure> contenant une image, un texte alternatif et une légende
+      const image = createImageWithCaption(item.imageUrl, item.title, item.category.name);
+      // Ajoute l'élément <figure> nouvellement créé à l'élément "divGallery"
+      divGallery.appendChild(image);
+    });
 
-  const projets = document.querySelector(".galery");
-// DIV "gallery"
-const divGallery = document.createElement("div");
-divGallery.classList.add("gallery");
-projets.appendChild(divGallery);
-// Fonction gallery (image + texte alt + légende)
+    // Sélectionne tous les boutons de filtre
+    const filterButtons = document.querySelectorAll(".filters button");
+
+    // Ajoute un écouteur d'événements sur chaque bouton de filtre
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        // Applique la classe "active" au bouton cliqué
+        filterButtons.forEach(b => b.classList.toggle("active", b === button));
+        // Récupère la première classe du bouton cliqué
+        const className = button.className.split(" ")[0];
+        // Sélectionne toutes les images à filtrer
+        const images = divGallery.querySelectorAll(".gallery-item");
+        // Parcours toutes les images et leur attribue la propriété "display" en fonction du filtre sélectionné
+        images.forEach(image => image.style.display = (className === "all" || image.classList.contains(className)) ? "block" : "none");
+      });
+    });
+  });
+
+// Crée un nouvel élément <figure> contenant une image, un texte alternatif et une légende
 function createImageWithCaption(src, alt, caption) {
   const figure = document.createElement('figure');
+  figure.classList.add("gallery-item");
   const image = document.createElement('img');
-  image.setAttribute('src', src);
-  image.setAttribute('alt', alt);
-  figure.appendChild(image);
-  const figcaption = document.createElement('figcaption');
-  figcaption.textContent = caption;
-  figure.appendChild(figcaption);
+  image.src = src;
+  image.alt = alt;
+  figure.append(image, document.createElement('figcaption').textContent = alt);
+  // Attribue la classe correspondant à la catégorie de l'image
+  if (caption === "Objets") figure.classList.add("objects");
+  else if (caption === "Appartements") figure.classList.add("apartments");
+  else if (caption === "Hotels & restaurants") figure.classList.add("hotels");
   return figure;
 }
-// Abajour Tahina
-const item0 = createImageWithCaption("http://localhost:5678/images/abajour-tahina1651286843956.png", 'Abajour Tahina', 'Abajour Tahina');
-divGallery.appendChild(item0);
-// Appartement Paris V
-const item1 = createImageWithCaption("http://localhost:5678/images/appartement-paris-v1651287270508.png", 'Appartement Paris V', 'Appartement Paris V');
-divGallery.appendChild(item1);
-// Restaurant Sushisen - Londres
-const item2 = createImageWithCaption("http://localhost:5678/images/restaurant-sushisen-londres1651287319271.png", 'Restaurant Sushisen - Londres', 'Restaurant Sushisen - Londres');
-divGallery.appendChild(item2);
-// Villa “La Balisiere” - Port Louis
-const item3 = createImageWithCaption("http://localhost:5678/images/la-balisiere1651287350102.png", 'Villa “La Balisiere” - Port Louis', 'Villa “La Balisiere” - Port Louis');
-divGallery.appendChild(item3);
-// Structures Thermopolis
-const item4 = createImageWithCaption("http://localhost:5678/images/structures-thermopolis1651287380258.png", 'Structures Thermopolis', 'Structures Thermopolis');
-divGallery.appendChild(item4);
-// Appartement Paris X
-const item5 = createImageWithCaption("http://localhost:5678/images/appartement-paris-x1651287435459.png", 'Appartement Paris X', 'Appartement Paris X');
-divGallery.appendChild(item5);
-// Pavillon “Le coteau” - Cassis
-const item6 = createImageWithCaption("http://localhost:5678/images/le-coteau-cassis1651287469876.png", 'Pavillon “Le coteau” - Cassis', 'Pavillon “Le coteau” - Cassis');
-divGallery.appendChild(item6);
-// Villa Ferneze - Isola d’Elba
-const item7 = createImageWithCaption("http://localhost:5678/images/villa-ferneze1651287511604.png", 'Villa Ferneze - Isola d’Elba', 'Villa Ferneze - Isola d’Elba');
-divGallery.appendChild(item7);
-// Appartement Paris XVIII
-const item8 = createImageWithCaption("http://localhost:5678/images/appartement-paris-xviii1651287541053.png", 'Appartement Paris XVIII', 'Appartement Paris XVIII');
-divGallery.appendChild(item8);
-// Bar “Lullaby” - Paris
-const item9 = createImageWithCaption("http://localhost:5678/images/bar-lullaby-paris1651287567130.png", 'Bar “Lullaby” - Paris', 'Bar “Lullaby” - Paris');
-divGallery.appendChild(item9);
-// Hotel First Arte - New Delhi
-const item10 = createImageWithCaption("http://localhost:5678/images/hotel-first-arte-new-delhi1651287605585.png", 'Hotel First Arte - New Delhi', 'Hotel First Arte - New Delhi');
-divGallery.appendChild(item10);
-  
+
+                 //Filter Button Selected//
+                 
+// Récupération de tous les boutons de la classe .filters
+const filterButtons = document.querySelectorAll('.filters button');
+
+// Boucle sur tous les boutons
+filterButtons.forEach(button => {
+  // Ajout d'un écouteur d'événements 'click'
+  button.addEventListener('click', () => {
+    // Suppression de la classe .fontButtonSelected de tous les boutons
+    filterButtons.forEach(button => {
+      button.classList.remove('fontButtonSelected');
+    });
+    // Ajout de la classe .fontButtonSelected au bouton sélectionné
+    button.classList.add('fontButtonSelected');
+  });
+});

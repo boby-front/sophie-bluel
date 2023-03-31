@@ -47,6 +47,18 @@ table {
 	border-spacing: 0;
 }
 /** end reset css**/
+
+/***** ToolBox ****/
+
+.flexBetween{
+	display: flex;
+	justify-content: space-between;
+}
+
+.textCenter{
+	text-align: center;
+}
+
 body {
 	max-width: 1140px;
 	margin:auto;
@@ -75,7 +87,6 @@ h1 > span {
 	font-family: 'Work Sans';
 	font-size:10px;
 	letter-spacing: 0.1em;
-;
 }
 
 h2{
@@ -125,6 +136,30 @@ li:hover {
 	text-align: center;
 	margin-bottom: 1em;
 }
+
+/******* FILTER ***********/
+.filters{
+	width: 40%;
+	margin: 50px auto;
+}
+
+.fontButton{
+	font-family: 'Syne';
+	font-size: 16px;
+	font-weight: 700;
+	background-color: white;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
+	color: #1D6154;
+	padding: 8px 15px;
+	cursor: pointer;
+}
+
+.fontButtonSelected{
+	background-color: #1D6154;
+	color: white;
+}
+
 .gallery {
 	width: 100%;
 	display: grid;
@@ -178,6 +213,12 @@ input[type="submit"]{
 	width: 180px;
 	text-align: center;
 	border-radius: 60px ;
+}
+
+/********** LOGIN***********/
+#login{
+	width: 30%;
+	margin: 200px auto;
 }
 
 footer nav ul {
