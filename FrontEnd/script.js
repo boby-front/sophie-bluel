@@ -69,3 +69,15 @@ filterButtons.forEach(button => {
     button.classList.add('fontButton2');
   });
 });
+
+
+// Récupération de l'élément <li> correspondant à la connexion
+const loginLink = document.querySelectorAll("header nav ul li")[2];
+
+// Ajout d'un gestionnaire d'événements de clic
+loginLink.addEventListener("click", function() {
+  // Redirection vers la page de connexion
+  window.location.href = "login.html";
+});
+
+
