@@ -66,18 +66,41 @@ filterButtons.forEach(button => {
     // Supprimer la classe "fontButton2" de tous les boutons
     filterButtons.forEach(b => b.classList.remove('fontButton2'));
     // Ajouter la classe "fontButton2" au bouton sélectionné
-    button.classList.add('fontButton2');
-  });
+button.classList.add('fontButton2');
 });
-
+});
 
 // Récupération de l'élément <li> correspondant à la connexion
 const loginLink = document.querySelectorAll("header nav ul li")[2];
 
-// Ajout d'un gestionnaire d'événements de clic
-loginLink.addEventListener("click", function() {
-  // Redirection vers la page de connexion
-  window.location.href = "login.html";
+// Fonction pour gérer l'affichage en fonction de l'état de connexion
+function manageDisplay() {
+const editorMode = document.querySelector('.editorMode');
+const editorModePs = document.querySelectorAll('.editorModeP');
+const filters = document.querySelector('.filters');
+const token = localStorage.getItem('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4MDYwODk0NCwiZXhwIjoxNjgwNjk1MzQ0fQ.MiDaAmKlEryxowfeiLg_CeTGWCBgEFvrnuZjN8Lu52s');
+
+if (token) {
+editorMode.style.display = 'flex';
+editorModePs.forEach(editorModeP => {
+  editorModeP.style.visibility = 'visible';
 });
+filters.style.display = 'none';
+loginLink.textContent = 'logout';
+loginLink.addEventListener('click', function (e) {
+e.preventDefault();
+localStorage.removeItem('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4MDYwODk0NCwiZXhwIjoxNjgwNjk1MzQ0fQ.MiDaAmKlEryxowfeiLg_CeTGWCBgEFvrnuZjN8Lu52s');
+window.location.reload();
+});
+} else {
+editorMode.style.display = 'none';
+filters.style.display = 'block';
+loginLink.textContent = 'login';
+loginLink.addEventListener('click', function (e) {
+e.preventDefault();
+window.location.href = 'login.html';
+});
+}
+}
 
-
+manageDisplay();

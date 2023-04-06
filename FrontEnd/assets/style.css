@@ -49,6 +49,15 @@ table {
 /** end reset css**/
 
 /***** ToolBox ****/
+.flexCenter{
+	display: flex;
+	align-items: center;
+}
+
+.flexJustifyCenter{
+	display: flex;
+	justify-content: center;
+}
 
 .flexBetween{
 	display: flex;
@@ -58,6 +67,7 @@ table {
 .textCenter{
 	text-align: center;
 }
+
 
 body {
 	max-width: 1140px;
@@ -129,6 +139,7 @@ li:hover {
 }
 #introduction h2 {
 	margin-bottom: 1em;
+	margin-top: 25px;
 }
 
 #introduction p {
@@ -139,6 +150,60 @@ li:hover {
 	margin-bottom: 1em;
 }
 
+#portfolio{
+	position: relative;
+}
+
+
+
+/******* EDITOR MODE *******/
+.editorDiv{
+	background-color: black;
+	padding: 5px;
+}
+
+.fontButtonEditor{
+	font-family: 'Syne';
+	font-size: 13px;
+	font-weight: 700;
+	background-color: white;
+	border: 1px solid black;
+	border-radius: 60px;
+	padding: 8px 15px;
+	cursor: pointer;
+}
+
+.whiteColor{
+	color: white;
+}
+
+.fontEditor{
+	font-size: 14px;
+	margin: 10px 20px 10px  0px;
+}
+
+.fontEditor i{
+	margin-right: 15px;
+}
+
+.marginLeft51{
+	margin-left: 51px;
+}
+
+
+#portfolio h2 + .fontEditor {
+	position: absolute;
+	top: 0px;
+	right: 340px;
+  }
+
+  .editorMode{
+	display: none;
+  }
+  
+  .editorModeP{
+	visibility: hidden;
+  }
 /******* FILTER ***********/
 .filters{
 	width: 40%;
