@@ -44,7 +44,7 @@ fetch('http://localhost:5678/api/works')
     filterButtons[0].classList.add('fontButton2');
   });
 
-// Créer un nouvel élément <figure> contenant une image, un texte alternatif et une légende
+
 function createImageWithCaption(src, alt, caption) {
   const figure = document.createElement('figure');
   figure.classList.add("gallery-item");
@@ -52,34 +52,30 @@ function createImageWithCaption(src, alt, caption) {
   image.src = src;
   image.alt = alt;
   figure.append(image, document.createElement('figcaption').textContent = alt);
-  // Attribuer la classe correspondant à la catégorie de l'image
   if (caption === "Objets") figure.classList.add("objects");
   else if (caption === "Appartements") figure.classList.add("apartments");
   else if (caption === "Hotels & restaurants") figure.classList.add("hotels");
   return figure;
 }
 
-// Ajouter un écouteur d'événements 'click' sur chaque bouton
-const filterButtons = document.querySelectorAll('.filters button');
-filterButtons.forEach(button => {
+
+ const filterButtons = document.querySelectorAll('.filters button');
+ filterButtons.forEach(button => {
   button.addEventListener('click', () => {
-    // Supprimer la classe "fontButton2" de tous les boutons
-    filterButtons.forEach(b => b.classList.remove('fontButton2'));
-    // Ajouter la classe "fontButton2" au bouton sélectionné
-button.classList.add('fontButton2');
+  filterButtons.forEach(b => b.classList.remove('fontButton2'));
+ button.classList.add('fontButton2');
 });
 });
 
-// Récupération de l'élément <li> correspondant à la connexion
+
+/**************   EDITOR MODE **************/
+
 const loginLink = document.querySelectorAll("header nav ul li")[2];
-
-// Fonction pour gérer l'affichage en fonction de l'état de connexion
 function manageDisplay() {
 const editorMode = document.querySelector('.editorMode');
 const editorModePs = document.querySelectorAll('.editorModeP');
 const filters = document.querySelector('.filters');
 const token = localStorage.getItem('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4MDYwODk0NCwiZXhwIjoxNjgwNjk1MzQ0fQ.MiDaAmKlEryxowfeiLg_CeTGWCBgEFvrnuZjN8Lu52s');
-
 if (token) {
 editorMode.style.display = 'flex';
 editorModePs.forEach(editorModeP => {
@@ -94,7 +90,6 @@ window.location.reload();
 });
 } else {
 editorMode.style.display = 'none';
-filters.style.display = 'block';
 loginLink.textContent = 'login';
 loginLink.addEventListener('click', function (e) {
 e.preventDefault();
@@ -104,3 +99,37 @@ window.location.href = 'login.html';
 }
 
 manageDisplay();
+
+
+
+/************  GESTIONS DE CLICK // TRAVAUX  MODALE***************/
+const galleryModal = document.getElementById("modal1");
+const galleryModalContent = galleryModal.querySelector("#gallery-modal");
+const closeModal = document.querySelector(".close-modal");
+document.querySelectorAll(".editorModeP").forEach(link => {
+  link.addEventListener("click", e => {
+    e.preventDefault();
+    galleryModalContent.innerHTML = "";
+    fetch("http://localhost:5678/api/works/")
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(image => {
+          const imgElement = document.createElement("img");
+          imgElement.src = image.imageUrl;
+          galleryModalContent.appendChild(imgElement);
+        });
+        galleryModal.style.display = "flex";
+      })
+      .catch(error => console.error(error));
+  });
+});
+galleryModal.addEventListener("click", e => {
+  if (e.target === galleryModal) {
+    galleryModal.style.display = "none";
+  }
+});
+closeModal.addEventListener("click", () => {
+  galleryModal.style.display = "none";
+});
+
+
