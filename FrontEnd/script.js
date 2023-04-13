@@ -1,46 +1,64 @@
-// Sélectionner l'élément HTML avec la classe "imagesGroup"
+        // ********* RECUPERATION DES DONNEES API (IMAGES, TITLE, CATEGORY) ********* // 
+        
+        // On  crée une galerie d'images en ajoutant un élément div 
+        // à un autre élément HTML qui contiendra la galerie.
+
+//Sélectionne l'élément HTML qui contiendra la galerie d'images et l'assigne à la variable 'imagesGroup'
 const imagesGroup = document.querySelector(".imagesGroup");
-
-// Créer un nouvel élément <div> et lui attribuer la classe "gallery"
+//Crée un élément div pour la galerie et l'assigne à la variable divGallery.
 const divGallery = document.createElement("div");
+//Ajoute la classe "gallery" à l'élément div de la galerie.
 divGallery.classList.add("gallery");
-
-// Ajouter l'élément <div> nouvellement créé à l'élément "imagesGroup"
+//Ajoute l'élément div de la galerie à l'élément HTML qui contiendra la galerie d'images.
 imagesGroup.appendChild(divGallery);
 
-// Envoyer une requête à l'API "http://localhost:5678/api/works"
-// et traiter la réponse sous forme de données JSON
+         
+
+        // ON utilise la méthode fetch() pour envoyer une requête HTTP à l'API. 
+        // La requête récupère les données des travaux qui seront utilisées pour 
+        // créer des images pour la galerie.
+
+//Envoie une requête GET à l'API pour récupérer les données des travaux, 
+//avec l'URL de l'API comme argument.
 fetch('http://localhost:5678/api/works')
+//Convertit la réponse HTTP en objet JSON pour être manipulée plus facilement.
   .then(response => response.json())
+//Exécute une fonction anonyme avec les données des travaux en argument.
   .then(data => {
-    // Parcourir les données reçues de l'API
+//Parcourt chaque élément de la liste des travaux.
     data.forEach(item => {
-      // Créer un nouvel élément <figure> contenant une image, un texte alternatif et une légende
+//Crée une image avec une légende et une catégorie, en utilisant les données de l'élément 
+//courant de la liste des travaux.
       const image = createImageWithCaption(item.imageUrl, item.title, item.category.name);
-      // Ajouter l'élément <figure> nouvellement créé à l'élément "divGallery"
       divGallery.appendChild(image);
     });
 
-    // Sélectionner tous les boutons de filtre
-    const filterButtons = document.querySelectorAll(".filters button");
+     
 
-    // Ajouter un écouteur d'événements sur chaque bouton de filtre
+          // ********** AJOUTS ET FONCTIONS DES FILTRES IMAGES **********//
+
+          // 
+
+//Sélectionne tous les boutons de filtre et les assigne à la variable filterButtons.
+    const filterButtons = document.querySelectorAll(".filters button");
+//Parcourt chaque bouton de filtre et ajoute un écouteur d'événement sur chaque bouton.
     filterButtons.forEach(button => {
+//Ajoute un écouteur d'événement sur le clic du bouton de filtre.
       button.addEventListener("click", () => {
-        // Appliquer la classe "active" au bouton cliqué
+//Ajoute la classe "active" au bouton cliqué et la supprime des autres.
         filterButtons.forEach(b => b.classList.toggle("active", b === button));
-        // Récupérer la première classe du bouton cliqué
+//Récupère la première classe du bouton cliqué.
         const className = button.classList[0];
-        // Sélectionner toutes les images à filtrer
+//Sélectionne toutes les images de la galerie.
         const images = divGallery.querySelectorAll(".gallery-item");
-        // Parcourir toutes les images et leur attribuer la propriété "display" en fonction du filtre sélectionné
+//Parcourt chaque image de la galerie.
         images.forEach(image => {
+//Affiche ou masque les images selon la classe du bouton cliqué.
           image.style.display = (className === "all" || image.classList.contains(className)) ? "block" : "none";
         });
       });
     });
-
-    // Ajouter la classe "fontButton2" au bouton "Tous"
+//Ajoute la classe "fontButton2" au premier bouton de filtre.
     filterButtons[0].classList.add('fontButton2');
   });
 
@@ -68,7 +86,7 @@ function createImageWithCaption(src, alt, caption) {
 });
 
 
-/**************   EDITOR MODE **************/
+                   //**************   EDITOR MODE **************//
 
 const loginLink = document.querySelectorAll("header nav ul li")[2];
 function manageDisplay() {
@@ -105,7 +123,11 @@ manageDisplay();
 /************  GESTIONS DE CLICK // TRAVAUX  MODALE***************/
 const galleryModal = document.getElementById("modal1");
 const galleryModalContent = galleryModal.querySelector("#gallery-modal");
-const closeModal = document.querySelector(".close-modal");
+const closeModal = document.querySelectorAll(".close-modal");
+const boutonModal = document.querySelector(".buttonModal");
+const modalWrapper = document.querySelector(".modal-wrapper");
+const modalAddPhoto = document.querySelector(".modal-addPhoto");
+
 document.querySelectorAll(".editorModeP").forEach(link => {
   link.addEventListener("click", e => {
     e.preventDefault();
@@ -114,22 +136,41 @@ document.querySelectorAll(".editorModeP").forEach(link => {
       .then(response => response.json())
       .then(data => {
         data.forEach(image => {
-          const imgElement = document.createElement("img");
-          imgElement.src = image.imageUrl;
-          galleryModalContent.appendChild(imgElement);
+          const imgContainer = document.createElement("div");
+          imgContainer.classList.add("img-container");
+          imgContainer.innerHTML = `
+            <img src="${image.imageUrl}" alt="">
+            <div class="trash-icon-container">
+              <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <p>éditer</p>
+          `;
+          galleryModalContent.appendChild(imgContainer);
         });
         galleryModal.style.display = "flex";
       })
       .catch(error => console.error(error));
   });
 });
+
+function closeModalHandler() {
+  galleryModal.style.display = "none";
+  modalWrapper.style.display = "block";
+  modalAddPhoto.style.display = "none";
+}
+
 galleryModal.addEventListener("click", e => {
   if (e.target === galleryModal) {
-    galleryModal.style.display = "none";
+    closeModalHandler();
   }
 });
-closeModal.addEventListener("click", () => {
-  galleryModal.style.display = "none";
+
+closeModal.forEach(element => {
+  element.addEventListener("click", closeModalHandler);
 });
 
-
+boutonModal.addEventListener("click", e => {
+  e.preventDefault();
+  modalWrapper.style.display = "none";
+  modalAddPhoto.style.display = "block";
+});

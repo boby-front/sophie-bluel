@@ -69,6 +69,11 @@ table {
 	justify-content: space-between;
 }
 
+.flexColumn{
+	display: flex;
+	flex-direction: column;
+}
+
 .textCenter{
 	text-align: center;
 }
@@ -160,7 +165,8 @@ li:hover {
 	position: relative;
 }
 
-/********* MODALE ********/
+/********* MODAL ********/
+
 .modal{
 	max-width: 1140px;
 	margin: auto;
@@ -174,23 +180,124 @@ li:hover {
 
   .modal-wrapper {
 	position: fixed;
-	border-radius: 20px;
+	border-radius: 15px;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 80%;
-	height: 600px;
+	width: 630px;
+	height: 630px;
 	max-width: 500px;
-	padding: 80px;
+	padding: 45px;
 	background-color: #fff;
 	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
 	z-index: 11;
   }
+
+  .modal-wrapper .remoteMessage{
+	color: red;
+	position: absolute;
+	left: 50%;
+	bottom: 50px;
+	transform: translateX(-50%);
+	cursor: pointer;
+
+  }
+
+  .modal-addPhoto{
+	position: fixed;
+	border-radius: 15px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 630px;
+	height: 630px;
+	max-width: 500px;
+	padding: 45px;
+	background-color: #fff;
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+	z-index: 11;
+	display: none;
+  }
+
+  .divAddPhoto{
+	height: 169px;
+	width: 420px;
+	margin: auto;
+	background: #E8F1F6;
+	padding-top: 20px;
+	box-sizing: border-box;
+	margin-top: 40px;
+  }
+
+  .divIconValidate i{
+	 color:#B9C5CC;
+	 font-size: 58px;
+  }
+
+  .buttonModal{
+	font-family: 'Syne';
+	font-weight: 700;
+	font-size: 1.2em;
+	color: white;
+	background-color: #1D6154;
+	width: 237px;
+	height: 36px;
+	text-align: center;
+	border-radius: 60px ;
+	cursor: pointer;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 100px;
+  }
+
+  .buttonAddPhoto{
+	font-family: 'Syne';
+	font-weight: 700;
+	font-size: 1.2em;
+	color:  #306685;
+	background: #CBD6DC;
+	width: 173px;
+	height: 36px;
+	text-align: center;
+	border-radius: 60px ;
+	cursor: pointer;
+	border: none;
+	margin: 10px 0px;
+	cursor: pointer;
+  }
+
+  .buttonValidate{
+	font-family: 'Syne';
+	font-weight: 700;
+	font-size: 1.2em;
+	color: white;
+	background: #A7A7A7;
+	width: 237px;
+	height: 36px;
+	text-align: center;
+	border-radius: 60px ;
+	cursor: pointer;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 100px;
+	border: none;
+  }
+
+  .line{
+	height:1px;
+	background-color: black;
+	width: 420px;
+	margin: auto;
+	left: 50%;
+	transform: translateX(-50%);
+	position: absolute;
+	bottom: 175px;
+  }
   
  #gallery-modal{
-	width: 450px;
-	margin: auto;
-	margin-top: 50px;
+	margin: 20px 25px 0px;
 	display: flex;
 	flex-wrap: wrap;
  }
@@ -198,7 +305,6 @@ li:hover {
   #gallery-modal img{
 	height: 105px;
 	width: 80px;
-	margin: 5px;
   }
 
   .close-modal{
@@ -210,33 +316,71 @@ li:hover {
 	cursor: pointer;
   }
 
-  /******* Icon Poubelle ****/
-  .image-container {
-	position: relative;
-  }
-  
-  .fas.fa-trash-alt {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	color: #fff;
-	background-color: rgba(0, 0, 0, 0.5);
-	padding: 5px;
-	border-radius: 50%;
-	cursor: pointer;
-  }
-  
+.modal-addPhoto form {
+	text-align: left;
+	width: 420px;
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+}
 
+.modal-addPhoto input, select{
+	height: 50px;
+	font-size: 1.2em;
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+	font-family: 'Work Sans', sans-serif;
+	padding: 15px;
+	box-sizing: border-box;
+}
+
+.modal-addPhoto select{
+	cursor: pointer;
+}
+
+.modal-addPhoto label {
+	margin: 2em 0 1em 0;
+}
+
+.modal-addPhoto textarea {
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+  /******* Icon Poubelle ****/
+  .img-container {
+	position: relative;
+	display: inline-block;
+	margin: 5px;
+  }
+
+  
+  .trash-icon-container {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	background-color: black;
+	cursor: pointer;
+	height: 15px;
+	width: 15px;
+	text-align: center;
+  }
+  
+  .fa-solid.fa-trash-can {
+	color: white;
+	font-size: 9px;
+  }
+  
   
 /******* EDITOR MODE *******/
 .editorDiv{
 	background-color: black;
 	padding: 5px 0px;
-	max-width: 1140px;
+	width: 1440px;
 	position: relative;
-	width: 100%;
 	margin: auto;
 	top: 0;
+	left: -150px;
 	z-index: 11
 }
 
@@ -315,7 +459,8 @@ li:hover {
 }
 
 .gallery {
-	width: 100%;
+	width: 85%;
+	margin: auto;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-column-gap: 20px;
@@ -420,6 +565,7 @@ input[type="submit"]{
 	color: red;
 	margin-bottom: 40px;
 }
+
 
 .fontLink{
 	color: black;
