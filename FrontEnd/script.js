@@ -1,32 +1,14 @@
 // ********* RECUPERATION DES DONNEES API (IMAGES, TITLE, CATEGORY) ********* //
 
-// On  crée une galerie d'images en ajoutant un élément div
-// à un autre élément HTML qui contiendra la galerie.
-
-//Sélectionne l'élément HTML qui contiendra la galerie d'images et l'assigne à la variable 'imagesGroup'
 const imagesGroup = document.querySelector(".imagesGroup");
-//Crée un élément div pour la galerie et l'assigne à la variable divGallery.
 const divGallery = document.createElement("div");
-//Ajoute la classe "gallery" à l'élément div de la galerie.
 divGallery.classList.add("gallery");
-//Ajoute l'élément div de la galerie à l'élément HTML qui contiendra la galerie d'images.
 imagesGroup.appendChild(divGallery);
 
-// ON utilise la méthode fetch() pour envoyer une requête HTTP à l'API.
-// La requête récupère les données des travaux qui seront utilisées pour
-// créer des images pour la galerie.
-
-//Envoie une requête GET à l'API pour récupérer les données des travaux,
-//avec l'URL de l'API comme argument.
 fetch("http://localhost:5678/api/works")
-  //Convertit la réponse HTTP en objet JSON pour être manipulée plus facilement.
   .then((response) => response.json())
-  //Exécute une fonction anonyme avec les données des travaux en argument.
   .then((data) => {
-    //Parcourt chaque élément de la liste des travaux.
     data.forEach((item) => {
-      //Crée une image avec une légende et une catégorie, en utilisant les données de l'élément
-      //courant de la liste des travaux.
       const image = createImageWithCaption(
         item.imageUrl,
         item.title,
@@ -37,6 +19,7 @@ fetch("http://localhost:5678/api/works")
 
     //La fonction  createImageWithCaption() sert à créer un élément figure contenant une image
     // et une légende avec une classe CSS optionnelle en fonction de la valeur de caption.
+
     function createImageWithCaption(src, alt, caption) {
       const figure = document.createElement("figure");
       figure.classList.add("gallery-item");
@@ -56,25 +39,16 @@ fetch("http://localhost:5678/api/works")
 
     // ********** AJOUTS ET FONCTIONS DES FILTRES IMAGES **********//
 
-    //
-
-    //Sélectionne tous les boutons de filtre et les assigne à la variable filterButtons.
     const filterButtons = document.querySelectorAll(".filters button");
-    //Parcourt chaque bouton de filtre et ajoute un écouteur d'événement sur chaque bouton.
     filterButtons.forEach((button) => {
-      //Ajoute un écouteur d'événement sur le clic du bouton de filtre.
       button.addEventListener("click", () => {
-        //Ajoute la classe "active" au bouton cliqué et la supprime des autres.
         filterButtons.forEach((b) =>
           b.classList.toggle("active", b === button)
         );
-        //Récupère la première classe du bouton cliqué.
         const className = button.classList[0];
-        //Sélectionne toutes les images de la galerie.
         const images = divGallery.querySelectorAll(".gallery-item");
         //Parcourt chaque image de la galerie.
         images.forEach((image) => {
-          //Affiche ou masque les images selon la classe du bouton cliqué.
           image.style.display =
             className === "all" || image.classList.contains(className)
               ? "block"
@@ -82,7 +56,6 @@ fetch("http://localhost:5678/api/works")
         });
       });
     });
-    //Ajoute la classe "fontButton2" au premier bouton de filtre.
     filterButtons[0].classList.add("fontButton2");
   });
 
@@ -97,13 +70,12 @@ filterButtons.forEach((button) => {
 //**************   EDITOR MODE **************//
 
 const loginLink = document.querySelectorAll("header nav ul li")[2];
+
 function manageDisplay() {
   const editorMode = document.querySelector(".editorMode");
   const editorModePs = document.querySelectorAll(".editorModeP");
   const filters = document.querySelector(".filters");
-  const token = localStorage.getItem(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4MDYwODk0NCwiZXhwIjoxNjgwNjk1MzQ0fQ.MiDaAmKlEryxowfeiLg_CeTGWCBgEFvrnuZjN8Lu52s"
-  );
+  const token = localStorage.getItem("authToken");
   if (token) {
     editorMode.style.display = "flex";
     editorModePs.forEach((editorModeP) => {
@@ -113,9 +85,7 @@ function manageDisplay() {
     loginLink.textContent = "logout";
     loginLink.addEventListener("click", function (e) {
       e.preventDefault();
-      localStorage.removeItem(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4MDYwODk0NCwiZXhwIjoxNjgwNjk1MzQ0fQ.MiDaAmKlEryxowfeiLg_CeTGWCBgEFvrnuZjN8Lu52s"
-      );
+      localStorage.removeItem("authToken");
       window.location.reload();
     });
   } else {
@@ -171,9 +141,7 @@ document.querySelectorAll(".editorModeP").forEach((link) => {
             fetch(`http://localhost:5678/api/works/${imageId}`, {
               method: "DELETE",
               headers: {
-                Authorization: `Bearer ${localStorage.getItem(
-                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY4MDYwODk0NCwiZXhwIjoxNjgwNjk1MzQ0fQ.MiDaAmKlEryxowfeiLg_CeTGWCBgEFvrnuZjN8Lu52s"
-                )}`,
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
               },
             })
               .then((response) => {
@@ -263,8 +231,7 @@ buttonAddPhoto.addEventListener("click", () => {
       fetch("http://localhost:5678/api/works", {
         method: "POST",
         headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1MTg3NDkzOSwiZXhwIjoxNjUxOTYxMzM5fQ.JGN1p8YIfR-M-5eQ-Ypy6Ima5cKA4VbfL2xMr2MgHm4",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: formData,
       })
