@@ -227,6 +227,15 @@ li:hover {
 	padding-top: 20px;
 	box-sizing: border-box;
 	margin-top: 40px;
+	position: relative;
+  }
+
+  .divAddPhoto img{
+	position: absolute;
+	top: 0;
+	right: 50%;
+	transform: translateX(50%);
+	height: 100%;
   }
 
   .divIconValidate i{
@@ -376,11 +385,10 @@ li:hover {
 .editorDiv{
 	background-color: black;
 	padding: 5px 0px;
-	width: 1440px;
+	width: 1140px;
 	position: relative;
 	margin: auto;
 	top: 0;
-	left: -150px;
 	z-index: 11
 }
 
