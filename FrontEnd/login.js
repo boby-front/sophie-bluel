@@ -1,5 +1,11 @@
 // **************** GESTION DE CONNECTION *************//
 
+// Ici j'ai développé un système de gestion de connexion. Les utilisateurs peuvent se connecter
+// avec leur e-mail et mot de passe. Le code interagit avec l'API du serveur pour vérifier
+// les informations d'identification et gérer les erreurs. En cas de succès, l'utilisateur est redirigé
+// vers la page d'accueil et un token d'authentification est stocké, et en cas d'erreur un message
+// indiquant la cause est affiché.
+
 const form = document.querySelector("#form");
 const errorMessage = document.querySelector("#error-message");
 

@@ -20,9 +20,6 @@ function createImageWithCaption(src, alt, caption) {
   return figure;
 }
 
-// Puis on utilise fetch pour récupérer les données de l'API.
-// Les données sont transformées en JSON avec la méthode .json().
-// Une boucle forEach est utilisée pour itérer à travers chaque élément de données.
 let allProjects = [];
 let allCategories = [
   {
@@ -30,6 +27,7 @@ let allCategories = [
     name: "Tous",
   },
 ];
+
 fetch("http://localhost:5678/api/works")
   .then((response) => response.json())
   .then((data) => {
@@ -46,11 +44,11 @@ fetch("http://localhost:5678/api/works")
   .catch((error) => {
     console.log(error);
   });
+
 // **********  2. FILTRAGE DES IMAGES PAR CATEGORIE. ************
 fetch("http://localhost:5678/api/categories")
   .then((response) => response.json())
   .then((categories) => {
-    //console.log(categories);
     categories.forEach((element) => {
       allCategories.push(element);
     });
@@ -171,38 +169,51 @@ document.querySelectorAll(".editorModeP").forEach((link) => {
 
       // ************  SUPRESSION DES IMAGES DU DOM DEPUIS L'API ***************
 
-      // On ajoute un evénement aux eléments "corbeille",
-      // On récupere l'ID de l'image.
-      // Une requête de suppression est envoyée au serveur en utilisant l'API Fetch avec l'ID de l'image
-      // et le tokken dans le localstorage. Si la réponse est ok, l'image est
-      // supprimée du DOM, sinon une erreur est levée.
+      const trashIcons = document.querySelectorAll(".fa-trash-can");
 
-      const trashIcon = imgContainer.querySelector(".fa-trash-can");
-      trashIcon.addEventListener("click", () => {
-        const imageId = imgContainer.getAttribute("data-id");
-
-        const confirmDelete = window.confirm(
-          "Êtes-vous sûr de vouloir supprimer cette image ?"
+      function removeImageFromDOM(imageId) {
+        const imageElement = document.querySelector(
+          `.gallery-item[data-category="${imageId}"]`
         );
-        if (confirmDelete) {
-          fetch(`http://localhost:5678/api/works/${imageId}`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          })
-            .then((response) => {
-              console.log(response);
-              if (response.ok) {
-                imgContainer.remove();
-              } else {
-                throw new Error("Erreur lors de la suppression de l'image");
-              }
-            })
-            .catch((error) => {
-              console.error(error);
-            });
+        if (imageElement) {
+          imageElement.remove();
         }
+
+        const modalImageElement = document.querySelector(
+          `.img-container[data-id="${imageId}"]`
+        );
+        if (modalImageElement) {
+          modalImageElement.remove();
+        }
+      }
+
+      trashIcons.forEach((trashIcon) => {
+        trashIcon.addEventListener("click", () => {
+          const imgContainer = trashIcon.parentNode.parentNode;
+          const imageId = imgContainer.getAttribute("data-id");
+
+          const confirmDelete = window.confirm(
+            "Êtes-vous sûr de vouloir supprimer cette image ?"
+          );
+          if (confirmDelete) {
+            fetch(`http://localhost:5678/api/works/${imageId}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              },
+            })
+              .then((response) => {
+                if (response.ok) {
+                  removeImageFromDOM(imageId);
+                } else {
+                  throw new Error("Erreur lors de la suppression de l'image");
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        });
       });
     });
 
@@ -256,10 +267,6 @@ function categorySelect(categories) {
 
 const buttonAddPhoto = document.querySelector(".buttonAddPhoto");
 const uploadForm = document.getElementById("uploadForm");
-
-// Un écouteur d'événement est ajouté sur le bouton d'ajout de photo pour déclencher
-// l'ouverture d'un explorateur de fichiers. Lorsque l'utilisateur sélectionne une photo,
-// l'événement change est déclenché.
 
 buttonAddPhoto.addEventListener("click", () => {
   const input = document.createElement("input");
