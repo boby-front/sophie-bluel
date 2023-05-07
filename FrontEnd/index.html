@@ -40,29 +40,25 @@
 		</div>
 
 		<div class="modal-addPhoto">
+			<i class="fa-solid fa-arrow-left"></i>
 			<p class="close-modal">x</p>
 			<h3 class="W40028px textCenter">Ajout photo</h3>
-				<div class="divAddPhoto textCenter">
-					<div class="divIconValidate">
-						<i class="fa-regular fa-image"></i>
-					</div>
-					<button class="buttonAddPhoto">+ Ajouter photo</button>
-					<p>jpg, png : 4mo max</p>
+			<div class="divAddPhoto textCenter">
+				<div class="divIconValidate">
+					<i class="fa-regular fa-image"></i>
 				</div>
-				<form id="uploadForm" action="http://localhost:5678/api/works" enctype="multipart/form-data">
-					<label for="title">Titre</label>
-					<input type="text" name="title" id="title">
-					<label for="category">Catégorie</label>
-					<select id="category" name="category" >
-						<option value="default"></option>
-						<option value="1">Objets</option>
-						<option value="2">Appartements</option>
-						<option value="3">Hotels & restaurants</option>
-						<option value="4">Bar & Restaurant</option>
-					</select>
-				</form>
-				<div class="line"></div>
-				<button class="buttonValidate">Valider</button>
+				<button class="buttonAddPhoto">+ Ajouter photo</button>
+				<p>jpg, png : 4mo max</p>
+			</div>
+			<form id="uploadForm" action="http://localhost:5678/api/works" enctype="multipart/form-data">
+				<label for="title">Titre</label>
+				<input type="text" name="title" id="title">
+				<label for="category">Catégorie</label>
+				<select id="category" name="category">
+				</select>
+			</form>
+			<div class="line"></div>
+			<button class="buttonValidate">Valider</button>
 		</div>
 	</aside>
 
@@ -106,11 +102,8 @@
 			<h2>Mes Projets</h2>
 			<a class="fontEditor editorModeP"><i class="fa-regular fa-pen-to-square fa-lg"></i>modifier</a>
 
-			<div class="filters flexBetween ">
-				<button class="all active fontButton">Tous</button>
-				<button class="objects fontButton">Objets</button>
-				<button class="apartments fontButton">Appartements</button>
-				<button class="hotels fontButton">Hôtels</button>
+			<div class=" filters flexBetween" id="blocFilter">
+
 			</div>
 			<div class="imagesGroup"></div>
 		</section>
