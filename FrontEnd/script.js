@@ -1,14 +1,20 @@
-// ****** 1. RECUPERATION DES DONNEES API ET AFFICHAGE DES IMAGES DANS LA GA
-// On récupere les éléments HTML et on créé l'endroit de réception des images.
+// ****** 1. RECUPERATION DES DONNEES API ET AFFICHAGE DES IMAGES DANS LA GALLERIE.
+
+// Récupération des données de l'API et affichage des images dans la galerie : On commence
+// par créer des éléments de la galerie et les ajouter au DOM. Ensuite, on effectue une requête
+// fetch à l'API pour récupérer les projets (images) et les catégories. Les projets sont stockés
+// dans le tableau allProjects. Les images sont créées à l'aide de la fonction createImageWithCaption
+// et ajoutées à la galerie.
 
 const imagesGroup = document.querySelector(".imagesGroup");
 const divGallery = document.createElement("div");
 divGallery.classList.add("gallery");
 imagesGroup.appendChild(divGallery);
 
-function createImageWithCaption(src, alt, caption) {
+function createImageWithCaption(id, src, alt, caption) {
   const figure = document.createElement("figure");
   figure.classList.add("gallery-item");
+  figure.setAttribute("data-id", id);
   const image = document.createElement("img");
   image.src = src;
   image.alt = alt;
@@ -21,12 +27,6 @@ function createImageWithCaption(src, alt, caption) {
 }
 
 let allProjects = [];
-let allCategories = [
-  {
-    id: -1,
-    name: "Tous",
-  },
-];
 
 fetch("http://localhost:5678/api/works")
   .then((response) => response.json())
@@ -34,6 +34,7 @@ fetch("http://localhost:5678/api/works")
     allProjects = data;
     data.forEach((item) => {
       const image = createImageWithCaption(
+        item.id,
         item.imageUrl,
         item.title,
         item.categoryId
@@ -46,6 +47,21 @@ fetch("http://localhost:5678/api/works")
   });
 
 // **********  2. FILTRAGE DES IMAGES PAR CATEGORIE. ************
+
+// On récupère des catégories à partir d'une API et crée des boutons de filtrage pour afficher
+// des éléments de galerie selon la catégorie choisie. Il commence par définir un tableau
+// allCategories avec une catégorie "Tous" ayant un ID de -1. Ensuite, il récupère les catégories
+// via l'API, les ajoute au tableau, et crée des boutons de filtrage pour chaque catégorie.
+// Les boutons sont ajoutés à l'élément HTML avec l'ID "blocFilter", et lorsqu'un bouton est cliqué,
+// les éléments de la galerie sont affichés ou masqués en fonction de la catégorie sélectionnée.
+
+let allCategories = [
+  {
+    id: -1,
+    name: "Tous",
+  },
+];
+
 fetch("http://localhost:5678/api/categories")
   .then((response) => response.json())
   .then((categories) => {
@@ -91,12 +107,17 @@ fetch("http://localhost:5678/api/categories")
 
 //**************   3. EDITOR MODE **************//
 
-const loginLink = document.querySelectorAll("header nav ul li")[2];
+// Pour le mode Administrateur on gère l'affichage des éléments en fonction de l'état de connexion
+// de l'utilisateur. Il vérifie si un token d'authentification existe dans le localStorage.
+// Si le token existe, l'utilisateur est considéré comme connecté et les éléments relatifs
+// au mode éditeur sont affichés, tandis que les filtres sont masqués. Le texte du lien de
+// connexion devient "logout" et un événement "click" est ajouté pour déconnecter l'utilisateur
+// en supprimant le token d'authentification et en rechargeant la page. Si le token n'existe pas,
+// le mode éditeur est masqué, le texte du lien de connexion est "login" et un événement "click"
+// est ajouté pour rediriger l'utilisateur vers la page de connexion. La fonction manageDisplay
+// est appelée pour gérer ces affichages.
 
-// On définit une fonction manageDisplay() qui est appelée au chargement de la page.
-// Cette fonction vérifie si un token d'authentification est présent dans le localStorage.
-// On y créé une condition qui affiche les liens qui redirigent vers la modal d'editeur d'image
-// et retire les filtres.
+const loginLink = document.querySelectorAll("header nav ul li")[2];
 
 function manageDisplay() {
   const editorMode = document.querySelector(".editorMode");
@@ -130,13 +151,6 @@ manageDisplay();
 
 // ************  4. GESTIONS DE CLICK // TRAVAUX  MODALE ***************
 
-// On recupere les éléments HTML.
-// On ajoute un écouteur d'événements sur chaque lien d'éditeur pour déclencher une action au clic.
-// L'action consiste à vider le contenu du modal et à récupérer les données de l'API en envoyant une requête fetch.
-// Chaque div d'image est ajoutée au contenu du modal. La div contenant l'image reçoit également
-// un attribut "data-id" avec l'identifiant de l'image dans la base de données pour permettre l'édition et
-// la suppression de l'image par l'utilisateur.
-
 const galleryModal = document.getElementById("modal1");
 const galleryModalContent = galleryModal.querySelector("#gallery-modal");
 const closeModal = document.querySelectorAll(".close-modal");
@@ -153,12 +167,29 @@ document.querySelectorAll(".editorModeP").forEach((link) => {
       const imgContainer = document.createElement("div");
       imgContainer.classList.add("img-container");
       imgContainer.setAttribute("data-id", image.id);
-      imgContainer.innerHTML = `
-            <img src="${image.imageUrl}" alt="">
-            <div class="trash-icon-container">
-              <i class="fa-solid fa-trash-can"></i>
-            </div>
-            <p>éditer</p>`;
+      const img = document.createElement("img");
+      img.src = image.imageUrl;
+      img.alt = "";
+      imgContainer.appendChild(img);
+      const divTrash = document.createElement("div");
+      divTrash.setAttribute("class", "trash-icon-container");
+
+      const icon = document.createElement("i");
+      icon.setAttribute("class", "fa-solid fa-trash-can");
+      divTrash.appendChild(icon);
+      imgContainer.appendChild(divTrash);
+      divTrash.addEventListener("click", function (Event) {
+        const confirmDelete = window.confirm(
+          "Êtes-vous sûr de vouloir supprimer cette image ?"
+        );
+        if (confirmDelete) {
+          deleteItem(image.id);
+        }
+      });
+
+      const text = document.createElement("p");
+      text.textContent = "éditer";
+      imgContainer.appendChild(text);
       galleryModalContent.appendChild(imgContainer);
 
       const arrowLeftIcon = document.querySelector(".fa-arrow-left");
@@ -169,54 +200,23 @@ document.querySelectorAll(".editorModeP").forEach((link) => {
 
       // ************  SUPRESSION DES IMAGES DU DOM DEPUIS L'API ***************
 
-      const trashIcons = document.querySelectorAll(".fa-trash-can");
+      // On gère la suppression d'images dans une galerie en ajoutant un événement "click"
+      // aux icônes de corbeille. Lorsqu'une icône est cliquée, une confirmation est demandée à l'utilisateur.
+      // Si confirmé, une requête DELETE est envoyée à l'API avec l'ID de l'image et le token d'authentification.
+      //  En cas de succès, le DOM est mis à jour pour refléter la suppression de l'image.
 
-      function removeImageFromDOM(imageId) {
-        const imageElement = document.querySelector(
-          `.gallery-item[data-category="${imageId}"]`
+      function updateMainGallery(imageId) {
+        const mainImage = document.querySelector(
+          `figure[data-id="${imageId}"]`
         );
-        if (imageElement) {
-          imageElement.remove();
-        }
-
-        const modalImageElement = document.querySelector(
-          `.img-container[data-id="${imageId}"]`
-        );
-        if (modalImageElement) {
-          modalImageElement.remove();
+        if (mainImage) {
+          mainImage.remove();
+          console.log("Image supprimée du DOM principal");
+        } else {
+          console.log("Image non trouvée dans le DOM principal");
         }
       }
-
-      trashIcons.forEach((trashIcon) => {
-        trashIcon.addEventListener("click", () => {
-          const imgContainer = trashIcon.parentNode.parentNode;
-          const imageId = imgContainer.getAttribute("data-id");
-
-          const confirmDelete = window.confirm(
-            "Êtes-vous sûr de vouloir supprimer cette image ?"
-          );
-          if (confirmDelete) {
-            fetch(`http://localhost:5678/api/works/${imageId}`, {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            })
-              .then((response) => {
-                if (response.ok) {
-                  removeImageFromDOM(imageId);
-                } else {
-                  throw new Error("Erreur lors de la suppression de l'image");
-                }
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          }
-        });
-      });
     });
-
     galleryModal.style.display = "flex";
   });
 });
@@ -262,6 +262,38 @@ function categorySelect(categories) {
   });
 }
 
+function deleteItem(imageId) {
+  fetch(`http://localhost:5678/api/works/${imageId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok && response.status == 204) {
+        console.log("l'element est bien supprimé");
+        allProjects = allProjects.filter((element) => element.id != imageId);
+        const figuresGalery = document.querySelectorAll(".gallery-item");
+        figuresGalery.forEach((element) => {
+          if (element.dataset.id == imageId) {
+            element.remove();
+          }
+        });
+        const figuresModal = document.querySelectorAll(".img-container");
+        figuresModal.forEach((element) => {
+          if (element.dataset.id == imageId) {
+            element.remove();
+          }
+        });
+      } else {
+        throw new Error("Erreur lors de la suppression de l'image");
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      alert("Une erreur est survenue Veuillez contacter l'admin du site!!");
+    });
+}
 // sélectionne le bouton d'ajout de photo et le formulaire d'upload en utilisant leur classe et
 //  leur identifiant respectifs.
 
@@ -319,9 +351,10 @@ buttonAddPhoto.addEventListener("click", () => {
           console.log(data);
           allProjects.push(data);
           const image = createImageWithCaption(
+            data.id,
             data.imageUrl,
             data.title,
-            "data.category.name"
+            data.categoryId
           );
           console.log(image);
           divGallery.appendChild(image);
