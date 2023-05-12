@@ -163,6 +163,9 @@ document.querySelectorAll(".editorModeP").forEach((link) => {
     e.preventDefault();
     galleryModalContent.innerHTML = "";
 
+    modalWrapper.style.display = "block";
+    modalAddPhoto.style.display = "none";
+
     allProjects.forEach((image) => {
       const imgContainer = document.createElement("div");
       imgContainer.classList.add("img-container");
@@ -197,25 +200,6 @@ document.querySelectorAll(".editorModeP").forEach((link) => {
         modalWrapper.style.display = "block";
         modalAddPhoto.style.display = "none";
       });
-
-      // ************  SUPRESSION DES IMAGES DU DOM DEPUIS L'API ***************
-
-      // On gère la suppression d'images dans une galerie en ajoutant un événement "click"
-      // aux icônes de corbeille. Lorsqu'une icône est cliquée, une confirmation est demandée à l'utilisateur.
-      // Si confirmé, une requête DELETE est envoyée à l'API avec l'ID de l'image et le token d'authentification.
-      //  En cas de succès, le DOM est mis à jour pour refléter la suppression de l'image.
-
-      function updateMainGallery(imageId) {
-        const mainImage = document.querySelector(
-          `figure[data-id="${imageId}"]`
-        );
-        if (mainImage) {
-          mainImage.remove();
-          console.log("Image supprimée du DOM principal");
-        } else {
-          console.log("Image non trouvée dans le DOM principal");
-        }
-      }
     });
     galleryModal.style.display = "flex";
   });
@@ -249,18 +233,7 @@ boutonModal.addEventListener("click", (e) => {
   modalWrapper.style.display = "none";
   modalAddPhoto.style.display = "block";
 });
-
-//************  AJOUTER UNE IMAGE COMME TRAVAUX *****************/
-
-function categorySelect(categories) {
-  const categorySelect = document.getElementById("category");
-  categories.forEach((category) => {
-    const option = document.createElement("option");
-    option.value = category.id;
-    option.textContent = category.name;
-    categorySelect.appendChild(option);
-  });
-}
+// ************  SUPRESSION DES IMAGES DU DOM DEPUIS L'API ***************
 
 function deleteItem(imageId) {
   fetch(`http://localhost:5678/api/works/${imageId}`, {
@@ -294,83 +267,106 @@ function deleteItem(imageId) {
       alert("Une erreur est survenue Veuillez contacter l'admin du site!!");
     });
 }
-// sélectionne le bouton d'ajout de photo et le formulaire d'upload en utilisant leur classe et
-//  leur identifiant respectifs.
+//************  AJOUTER UNE IMAGE COMME TRAVAUX *****************/
+
+function categorySelect(categories) {
+  const categorySelect = document.getElementById("category");
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.name;
+    categorySelect.appendChild(option);
+  });
+}
 
 const buttonAddPhoto = document.querySelector(".buttonAddPhoto");
 const uploadForm = document.getElementById("uploadForm");
+const buttonValidate = document.querySelector(".buttonValidate");
+
+// Création d'un seul élément input et ajout de l'écouteur d'événements "change"
+const input = document.createElement("input");
+input.type = "file";
+input.name = "image";
+input.accept = "image/*";
+input.style.display = "none";
+uploadForm.appendChild(input);
+
+let file; // déplacez 'file' ici pour le rendre accessible dans le reste du code
+
+input.addEventListener("change", () => {
+  file = input.files[0];
+  const modal = document.querySelector(".modal-addPhoto");
+  const titleInput = modal.querySelector("#title");
+  const categorySelect = modal.querySelector("#category");
+
+  function enableValidateButton() {
+    buttonValidate.style.backgroundColor =
+      titleInput.value.trim() !== "" && categorySelect.value !== "default"
+        ? "#1D6154"
+        : "";
+  }
+
+  titleInput.addEventListener("input", enableValidateButton);
+  categorySelect.addEventListener("input", enableValidateButton);
+
+  // On affiche l'image selectionné et masque le paragraphe et le boutton.
+  const img = document.createElement("img");
+  img.id = "upload-image";
+  img.src = URL.createObjectURL(file);
+  const divAddPhoto = modal.querySelector(".divAddPhoto");
+  divAddPhoto.appendChild(img);
+  divAddPhoto.querySelector("p").style.display = "none";
+  divAddPhoto.querySelector("button").style.display = "none";
+});
+
+buttonValidate.addEventListener("click", (event) => {
+  // déplacez l'écouteur d'événements 'click' ici
+  event.preventDefault();
+  const modal = document.querySelector(".modal-addPhoto");
+  const titleInput = modal.querySelector("#title");
+  const categorySelect = modal.querySelector("#category");
+
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("title", titleInput.value);
+  formData.append("category", categorySelect.value);
+
+  // votre code fetch ici...
+
+  fetch("http://localhost:5678/api/works", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      allProjects.push(data);
+      const image = createImageWithCaption(
+        data.id,
+        data.imageUrl,
+        data.title,
+        data.categoryId
+      );
+      console.log(image);
+      divGallery.appendChild(image);
+      galleryModal.style.display = "none";
+
+      uploadForm.reset();
+      const divAddPhoto = modal.querySelector(".divAddPhoto");
+      divAddPhoto.querySelector("p").style.display = "block";
+      divAddPhoto.querySelector("button").style.display = "block";
+      buttonValidate.style.background = "#a7a7a7";
+      const uploadedImage = document.getElementById("upload-image");
+      if (uploadedImage) {
+        divAddPhoto.removeChild(uploadedImage);
+      }
+    })
+    .catch((error) => console.error(error));
+});
 
 buttonAddPhoto.addEventListener("click", () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.name = "image";
-  input.accept = "image/*";
-  input.style.display = "none";
-  uploadForm.appendChild(input);
-
-  // Dans la fonction de rappel de l'événement "change", le code récupère la photo sélectionnée
-  //  par l'utilisateur et l'affiche dans la fenêtre modale.
-
-  input.addEventListener("change", () => {
-    const file = input.files[0];
-    const modal = document.querySelector(".modal-addPhoto");
-    const titleInput = modal.querySelector("#title");
-    const categorySelect = modal.querySelector("#category");
-    const buttonValidate = modal.querySelector(".buttonValidate");
-
-    function enableValidateButton() {
-      buttonValidate.style.backgroundColor =
-        titleInput.value.trim() !== "" && categorySelect.value !== "default"
-          ? "#1D6154"
-          : "";
-    }
-
-    titleInput.addEventListener("input", enableValidateButton);
-    categorySelect.addEventListener("input", enableValidateButton);
-
-    // Lorsqu'on clique sur le bouton "Valider", une requête fetch est envoyée au serveur
-    // pour envoyer la photo avec le titre et la catégorie sélectionnés. Si la requête réussit,
-    // la fenêtre modale est fermée.
-
-    buttonValidate.addEventListener("click", (event) => {
-      event.preventDefault();
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("title", titleInput.value);
-      formData.append("category", categorySelect.value);
-
-      fetch("http://localhost:5678/api/works", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          allProjects.push(data);
-          const image = createImageWithCaption(
-            data.id,
-            data.imageUrl,
-            data.title,
-            data.categoryId
-          );
-          console.log(image);
-          divGallery.appendChild(image);
-          galleryModal.style.display = "none";
-        })
-        .catch((error) => console.error(error));
-    });
-
-    // On affiche l'image selectionné et masque le paragraphe et le boutton.
-
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-    const divAddPhoto = modal.querySelector(".divAddPhoto");
-    divAddPhoto.appendChild(img);
-    divAddPhoto.querySelector("p").style.display = "none";
-    divAddPhoto.querySelector("button").style.display = "none";
-  });
   input.click();
 });
