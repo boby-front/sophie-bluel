@@ -84,7 +84,7 @@ fetch("http://localhost:5678/api/categories")
 
     allCategories.forEach((category) => {
       const buttonFilter = document.createElement("button");
-      buttonFilter.setAttribute("class", "all active fontButton");
+      buttonFilter.setAttribute("class", "fontButton");
       buttonFilter.setAttribute("id", category.id);
       buttonFilter.textContent = category.name;
 
@@ -99,7 +99,6 @@ fetch("http://localhost:5678/api/categories")
         });
         buttonFilter.classList.add("fontButton2");
 
-        buttonFilter.setAttribute("class", "all active fontButton fontButton2");
         divGallery.querySelectorAll(".gallery-item").forEach((image) => {
           image.style.display =
             buttonFilter.id == -1 ||
@@ -126,7 +125,7 @@ fetch("http://localhost:5678/api/categories")
 // est ajouté pour rediriger l'utilisateur vers la page de connexion. La fonction manageDisplay
 // est appelée pour gérer ces affichages.
 
-const loginLink = document.querySelectorAll("header nav ul li")[2];
+const loginLink = document.querySelector("#loginLink");
 
 function manageDisplay() {
   const editorMode = document.querySelector(".editorMode");
@@ -137,26 +136,35 @@ function manageDisplay() {
   if (token) {
     editorMode.style.display = "flex";
     editorModePs.forEach((editorModeP) => {
+      editorModeP.style.display = "block";
       editorModeP.style.visibility = "visible";
     });
     filters.style.display = "none";
     loginLink.textContent = "logout";
-    loginLink.addEventListener("click", function (e) {
-      e.preventDefault();
-      localStorage.removeItem("authToken");
-      window.location.reload();
-    });
+    loginLink.classList.remove("login-link");
   } else {
     editorMode.style.display = "none";
-    loginLink.textContent = "login";
-    loginLink.addEventListener("click", function (e) {
-      e.preventDefault();
-      window.location.href = "login.html";
+    editorModePs.forEach((editorModeP) => {
+      editorModeP.style.display = "none";
+      editorModeP.style.visibility = "hidden";
     });
+    filters.style.display = "block";
+    loginLink.textContent = "login";
+    loginLink.classList.add("login-link");
   }
 }
 
 manageDisplay();
+
+loginLink.addEventListener("click", () => {
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    localStorage.removeItem("authToken");
+    manageDisplay();
+  } else {
+    window.location.href = "login.html";
+  }
+});
 
 // ************  4. GESTIONS DE CLICK // TRAVAUX  MODALE ***************
 
@@ -249,6 +257,7 @@ boutonModal.addEventListener("click", (e) => {
   modalWrapper.style.display = "none";
   modalAddPhoto.style.display = "block";
 });
+
 // ************  SUPRESSION DES IMAGES DU DOM DEPUIS L'API ***************
 
 // La fonction deleteItem(imageId) envoie une requête DELETE à l'URL spécifiée avec l'ID de l'image

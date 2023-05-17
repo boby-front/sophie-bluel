@@ -25,6 +25,8 @@ form.addEventListener("submit", (e) => {
       if (response.status === 200) {
         return response.json();
       } else if (response.status === 404) {
+        throw new Error("Utilisateur non trouvé.");
+      } else if (response.status === 401) {
         throw new Error("Nom d'utilisateur ou mot de passe incorrect.");
       } else {
         throw new Error("Une erreur s'est produite lors de la connexion.");

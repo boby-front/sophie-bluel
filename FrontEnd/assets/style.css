@@ -521,8 +521,14 @@ select {
 
 /******* FILTER ***********/
 #blocFilter {
-  width: 50%;
+  width: 55%;
   margin: 50px auto;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#blocFilter button {
+  margin: 0 10px;
 }
 
 .fontButton {
