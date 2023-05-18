@@ -48,21 +48,30 @@ fetch("http://localhost:5678/api/works")
 
 // **********  2. FILTRAGE DES IMAGES PAR CATEGORIE. ************
 
-// Les images sont filtrées en fonction des catégories sélectionnées.
+//Cette fonction crée une nouvelle option pour chaque catégorie dans la liste des catégories et
+// l'ajoute à la sélection de catégorie. La valeur de chaque option est l'ID de la catégorie et le
+// texte est le nom de la catégorie.
 
-// - "allCategories" est initialisée avec un tableau contenant une catégorie spéciale "Tous".
-// - Une requête est effectuée à l'URL  pour obtenir la liste des catégories disponibles.
-// - La réponse de la requête est traitée en convertissant la réponse en JSON.
-// - Pour chaque catégorie obtenue, l'objet catégorie est ajouté au tableau allCategories.
-// HTML avec les options de catégorie.
-// - L'élément du DOM avec l'ID "blocFilter" est sélectionné.
-// - Pour chaque catégorie dans allCategories, un bouton est créé et configuré avec les
-// attributs appropriés, tels que la classe, l'ID et le texte.
-// - Si la catégorie a un ID de -1, une classe supplémentaire "fontButton2" est ajoutée au bouton.
-// - Le bouton est ajouté à l'élément du DOM avec l'ID "blocFilter"
-// - Un écouteur d'événement est attaché à chaque bouton pour gérer le clic de l'utilisateur.
-// - Lorsqu'un bouton est cliqué, tous les boutons du filtre sont réinitialisés en supprimant la classe "fontButton2" et le bouton cliqué reçoit la classe "fontButton2".
-// - Ensuite, tous les éléments de la galerie d'images ayant la classe "gallery-item" sont parcourus.
+// Ensuite, une liste de toutes les catégories est initialisée avec une catégorie par défaut "Tous"
+// qui a un ID de -1.
+
+// Une requête est effectuée pour obtenir toutes les catégories de l'API. Pour chaque catégorie reçue,
+// elle est ajoutée à la liste de toutes les catégories et la fonction categorySelect est appelée pour
+// ajouter la catégorie à la sélection de catégorie.
+
+// Ensuite, un bouton de filtre est créé pour chaque catégorie dans la liste de toutes les catégories
+// et ajouté au bloc de filtre. Chaque bouton a un événement de clic qui met à jour la classe du bouton
+// et affiche ou masque les images de la galerie en fonction de la catégorie du bouton.
+
+function categorySelect(categories) {
+  const categorySelect = document.getElementById("category");
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.name;
+    categorySelect.appendChild(option);
+  });
+}
 
 let allCategories = [
   {
@@ -115,15 +124,18 @@ fetch("http://localhost:5678/api/categories")
 
 //**************   3. EDITOR MODE **************//
 
-// Pour le mode Administrateur on gère l'affichage des éléments en fonction de l'état de connexion
-// de l'utilisateur. Il vérifie si un token d'authentification existe dans le localStorage.
-// Si le token existe, l'utilisateur est considéré comme connecté et les éléments relatifs
-// au mode éditeur sont affichés, tandis que les filtres sont masqués. Le texte du lien de
-// connexion devient "logout" et un événement "click" est ajouté pour déconnecter l'utilisateur
-// en supprimant le token d'authentification et en rechargeant la page. Si le token n'existe pas,
-// le mode éditeur est masqué, le texte du lien de connexion est "login" et un événement "click"
-// est ajouté pour rediriger l'utilisateur vers la page de connexion. La fonction manageDisplay
-// est appelée pour gérer ces affichages.
+// Cette fonction vérifie si un token d'authentification est présent dans le localStorage.
+// Si un token est trouvé, cela signifie que l'utilisateur est connecté. Par conséquent, nous affichons
+// les éléments relatifs au mode éditeur et masquons les filtres. De plus, nous changeons le texte
+// du lien de connexion pour dire "logout" et ajoutons un événement "click" pour permettre à
+// l'utilisateur de se déconnecter. Cette action de déconnexion supprime le token d'authentification
+// et met à jour l'affichage en conséquence.
+// Si aucun token n'est trouvé, cela signifie que l'utilisateur n'est pas connecté.
+// Dans ce cas, nous masquons le mode éditeur, changeons le texte du lien de connexion pour dire
+// "login" et ajoutons un événement "click" pour rediriger l'utilisateur vers la page de connexion.
+// De plus, nous affichons les filtres.
+// La fonction manageDisplay est appelée pour gérer ces affichages en fonction de l'état de
+// connexion de l'utilisateur.
 
 const loginLink = document.querySelector("#loginLink");
 
@@ -168,18 +180,20 @@ loginLink.addEventListener("click", () => {
 
 // ************  4. GESTIONS DE CLICK // TRAVAUX  MODALE ***************
 
-// - Sélection des éléments DOM nécessaires avec des sélecteurs.
-// - Attachement d'un écouteur d'événement à chaque élément  pour exécuter une fonction associée au clic.
-// - Vidage du contenu de l'élément avec l'ID "gallery-modal".
-// - Configuration de l'affichage ou de la masquage d'éléments de l'interface utilisateur via les
-// éléments "modalWrapper" et "modalAddPhoto".
-// - Création et configuration d'éléments DOM pour chaque élément du tableau allProjects.
-// - Attachement d'un écouteur d'événement à l'icône de corbeille pour afficher une boîte de
-// confirmation de suppression.
-// - Attachement d'un écouteur d'événement à l'icône de la flèche gauche pour configurer l'affichage
-// des éléments de l'interface utilisateur.
-// - Ajout du contenu généré à l'élément avec l'ID "gallery-modal".
-// - Affichage de la modalité de la galerie en définissant la propriété display sur "flex".
+//Ce code ajoute un événement de clic à chaque lien dans le mode éditeur.
+// Lorsqu'un lien est cliqué, le contenu de la modal de la galerie est vidé et la modal est affichée.
+// Ensuite, pour chaque projet dans la liste de tous les projets, une nouvelle image est créée et ajoutée
+// à la modal.
+
+// Pour chaque image, un nouveau conteneur est créé et l'image est ajoutée à ce conteneur. Un icône de poubelle est
+// également ajouté à chaque conteneur d'image. Un événement de clic est ajouté à chaque icône de poubelle, ce qui
+// permet de supprimer l'image associée si l'utilisateur confirme son intention de le faire.
+
+// Ensuite, un nouveau paragraphe est créé avec le texte "éditer" et ajouté à chaque conteneur d'image.
+// Enfin, chaque conteneur d'image est ajouté au contenu de la modal de la galerie.
+
+// Un événement de clic est également ajouté à l'icône de la flèche gauche, ce qui permet de fermer la modal d'ajout
+// de photo et d'afficher la modal de la galerie.
 
 const galleryModal = document.getElementById("modal1");
 const galleryModalContent = galleryModal.querySelector("#gallery-modal");
@@ -300,20 +314,6 @@ function deleteItem(imageId) {
     });
 }
 //************  AJOUTER UNE IMAGE COMME TRAVAUX *****************/
-
-// On créé une fonction qui permet de remplir un élément de sélection HTML avec des options générées
-// à partir d'un tableau d'objets de catégories. Chaque option a une valeur et un texte
-// correspondant à l'id et au nom de la catégorie.
-
-function categorySelect(categories) {
-  const categorySelect = document.getElementById("category");
-  categories.forEach((category) => {
-    const option = document.createElement("option");
-    option.value = category.id;
-    option.textContent = category.name;
-    categorySelect.appendChild(option);
-  });
-}
 
 // Ce bloc déclare les variables et constantes nécessaires pour les éléments et les données
 // utilisées dans le reste du code. Il crée également un élément <input> de type "file"
